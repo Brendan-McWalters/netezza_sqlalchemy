@@ -28,7 +28,8 @@ class BYTEINT(sqltypes.INTEGER):
 class NVARCHAR(sqltypes.NVARCHAR):
     '''Netezza NVARCHAR'''
     def __init__(self, length=None, collation=None,
-                 convert_unicode='force'):
+                 convert_unicode='force' #,unicode_error=coerce_nvarchar
+                 ):
         super(NVARCHAR, self).__init__(
             length,
             collation=collation,
@@ -171,6 +172,7 @@ class NetezzaODBC(PyODBCConnector, PGDialect):
     returns_unicode_strings = False
     supports_native_enum = False
     supports_sequences = True
+    supports_smallserial = False
     sequences_optional = False
     isolation_level = 'READ COMMITTED'
     max_identifier_length = 128
@@ -233,8 +235,9 @@ class NetezzaODBC(PyODBCConnector, PGDialect):
         for name, typeid, nullable, length, format_type in rows:
             coltype_class, has_length = oid_datatype_map[typeid]
             if coltype_class is sqltypes.Numeric:
+                print format_type
                 precision, scale = re.match(
-                    r'numeric\((\d+),(\d+)\)', format_type).groups()
+                    r'numeric|NUMERIC\((\d+),(\d+)\)', format_type).groups()
                 coltype = coltype_class(int(precision), int(scale))
             elif has_length:
                 coltype = coltype_class(length)
