@@ -7,8 +7,9 @@ from sqlalchemy.dialects.postgresql.base import (
     PGDialect, PGTypeCompiler, PGCompiler, PGDDLCompiler, DOUBLE_PRECISION,
     INTERVAL, TIME, TIMESTAMP)
 import sqlalchemy.types as sqltypes
-from sqlalchemy.schema import SchemaItem
+from sqlalchemy.schema import SchemaItem, DDLElement
 from sqlalchemy.sql import text, bindparam
+from sqlalchemy.ext.compiler import compiles
 import pyodbc
 import re
 
@@ -27,8 +28,7 @@ class BYTEINT(sqltypes.INTEGER):
 class NVARCHAR(sqltypes.NVARCHAR):
     '''Netezza NVARCHAR'''
     def __init__(self, length=None, collation=None,
-                 convert_unicode='force',
-                 unicode_error=coerce_nvarchar):
+                 convert_unicode='force'):
         super(NVARCHAR, self).__init__(
             length,
             collation=collation,
